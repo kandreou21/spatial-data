@@ -1,0 +1,55 @@
+Meros 2
+
+Query  1 results: 
+13151 15262 15774 16782 21379 22260 22500 22946 22947 
+Cells: 1
+Results: 9
+----------
+Query  2 results: 
+33887 34512 34862 
+Cells: 1
+Results: 3
+----------
+Query  3 results: 
+30397 
+Cells: 2
+Results: 1
+----------
+Query  4 results: 
+1108 
+Cells: 1
+Results: 1
+----------
+Query  5 results: 
+5496 
+Cells: 3
+Results: 1
+----------
+
+Meros 3
+
+Query  1 results: 
+21379 22260 22500 22946 22947 
+Cells: 1
+Results: 5
+----------
+Query  2 results: 
+34512 
+Cells: 1
+Results: 1
+----------
+Query  3 results: 
+30397 
+Cells: 2
+Results: 1
+----------
+Query  4 results: 
+
+Cells: 1
+Results: 0
+----------
+Query  5 results: 
+5496 
+Cells: 3
+Results: 1
+----------
