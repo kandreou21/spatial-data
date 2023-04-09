@@ -26,7 +26,6 @@ public class Main {
 		
 		Grid grid = new Grid();
 		HashMap<Integer, Record> records = grid.parseFile();
-		
 		records.entrySet().forEach(entry -> {
 		    System.out.println(entry.getKey() + " " + entry.getValue());
 		});
