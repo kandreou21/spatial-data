@@ -1,4 +1,6 @@
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,12 +25,17 @@ public class Main {
 		Record record = new Record(1, mbr, linestring);
 		System.out.println(record.toString());
 		*/
-		
-		Grid grid = new Grid();
-		HashMap<Integer, Record> records = grid.parseFile();
-		records.entrySet().forEach(entry -> {
-		    System.out.println(entry.getKey() + " " + entry.getValue());
-		});
-		
+		/*
+		SelectionQuery query = new SelectionQuery();
+		try {
+			query.loadGrid();
+			query.answerQueries();
+		} catch (IOException e) {}
+		 */
+		RefinementStep query = new RefinementStep();
+		try {
+			query.loadGrid();
+			query.answerQueries();
+		} catch (IOException e) {}
 	}
 }
