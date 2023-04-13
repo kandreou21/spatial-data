@@ -73,8 +73,9 @@ public class RefinementStep {
 			for (List<Integer> key : cellContents.keySet()) {	//for each key(where key is the cell's coordinates, ie (0,0))
 			    int x = key.get(0);
 			    int y = key.get(1);
-				if (cellContents.get(key).size() != 0) {	//an temnetai to cell(exei mapping se id)
-					if (grid[x][y].intersects(queries, i)) {
+				if (cellContents.get(key).size() != 0) {	//if cell has a mapping to at least one id
+					List<Double> query = List.of(queries.get(i), queries.get(i+1), queries.get(i+2), queries.get(i+3)); //xmin, xmax, ymin, ymax
+					if (grid[x][y].intersects(query)) {
 						numCells++;
 						for (Integer id : cellContents.get(key)) {	
 							double[][] mbr = records.get(id).getMbr();
@@ -83,7 +84,18 @@ public class RefinementStep {
 									double[] referencePoint = {Math.max(mbr[0][0], queries.get(i)), Math.max(mbr[0][1], queries.get(i+2))};  
 									if (referencePoint[0] >= grid[x][y].getXMin() && referencePoint[0] <= grid[x][y].getXMax() && referencePoint[1] >= grid[x][y].getYMin() && referencePoint[1] <= grid[x][y].getYMax()) {
 										ids.add(id);	
-										
+										if ((mbr[0][0] >= queries.get(i) && mbr[1][0] <= queries.get(i+1)) || (mbr[0][1] >= queries.get(i+2) && mbr[1][1] <= queries.get(i+3))) { //query contains x or y axis of mbr
+											refinementStepIds.add(id);
+										} else {
+											List<List<Double>> linestring = records.get(id).getLinestring();
+											for (int j = 0; j < linestring.size()-1; j++) {
+												List<List<Double>> lineSegment = List.of(linestring.get(j), linestring.get(j+1));	
+												if (intersects(lineSegment, query)) {
+													refinementStepIds.add(id);
+													break;
+												}
+											}
+										}
 									}
 								}
 							}
@@ -91,11 +103,59 @@ public class RefinementStep {
 			    	}
 			    }
 			}
-			System.out.println("Query " + queryNum + " results: \n" + ids);			
+			System.out.println("Query " + queryNum + " results: \n" + refinementStepIds);			
 			System.out.println("Cells: " + numCells);
-			System.out.println("Results: " + ids.size());
+			System.out.println("Results: " + refinementStepIds.size());
 			System.out.println("----------");
 			queryNum++;
 		}
+	}
+	
+	private boolean intersects(List<List<Double>> lineSegment, List<Double> query) {
+		double t = (((lineSegment.get(0).get(0)-query.get(0)) * (query.get(3)-query.get(3))) - ((lineSegment.get(0).get(1)-query.get(3)) * (query.get(0)-query.get(1)))) / 
+				   (((lineSegment.get(0).get(0)-lineSegment.get(1).get(0)) * (query.get(3)-query.get(3))) - ((lineSegment.get(0).get(1)-lineSegment.get(1).get(1)) * (query.get(0)-query.get(1))));
+		
+		double u = (((lineSegment.get(0).get(0)-query.get(0)) * (lineSegment.get(0).get(1)-lineSegment.get(1).get(1))) - ((lineSegment.get(0).get(1)-query.get(3)) * (lineSegment.get(0).get(0)-lineSegment.get(1).get(0)))) / 
+				   (((lineSegment.get(0).get(0)-lineSegment.get(1).get(0)) * (query.get(3)-query.get(3))) - ((lineSegment.get(0).get(1)-lineSegment.get(1).get(1)) * (query.get(0)-query.get(1))));
+		if ((t >= 0 && t <= 1) && (u >= 0 && u <= 1)) {
+			return true;
+		} //window's upper line segment
+		
+		t = (((lineSegment.get(0).get(0)-query.get(0)) * (query.get(2)-query.get(2))) - ((lineSegment.get(0).get(1)-query.get(2)) * (query.get(0)-query.get(1)))) / 
+			(((lineSegment.get(0).get(0)-lineSegment.get(1).get(0)) * (query.get(2)-query.get(2))) - ((lineSegment.get(0).get(1)-lineSegment.get(1).get(1)) * (query.get(0)-query.get(1))));
+		
+		u = (((lineSegment.get(0).get(0)-query.get(0)) * (lineSegment.get(0).get(1)-lineSegment.get(1).get(1))) - ((lineSegment.get(0).get(1)-query.get(2)) * (lineSegment.get(0).get(0)-lineSegment.get(1).get(0)))) / 
+			(((lineSegment.get(0).get(0)-lineSegment.get(1).get(0)) * (query.get(2)-query.get(2))) - ((lineSegment.get(0).get(1)-lineSegment.get(1).get(1)) * (query.get(0)-query.get(1))));
+		if ((t >= 0 && t <= 1) && (u >= 0 && u <= 1)) {
+			return true;
+		} //window's lower line	segment
+		
+		t = (((lineSegment.get(0).get(0)-query.get(0)) * (query.get(2)-query.get(3))) - ((lineSegment.get(0).get(1)-query.get(2)) * (query.get(0)-query.get(0)))) / 
+			(((lineSegment.get(0).get(0)-lineSegment.get(1).get(0)) * (query.get(2)-query.get(3))) - ((lineSegment.get(0).get(1)-lineSegment.get(1).get(1)) * (query.get(0)-query.get(0))));	
+		
+		u = (((lineSegment.get(0).get(0)-query.get(0)) * (lineSegment.get(0).get(1)-lineSegment.get(1).get(1))) - ((lineSegment.get(0).get(1)-query.get(2)) * (lineSegment.get(0).get(0)-lineSegment.get(1).get(0)))) / 
+			(((lineSegment.get(0).get(0)-lineSegment.get(1).get(0)) * (query.get(2)-query.get(3))) - ((lineSegment.get(0).get(1)-lineSegment.get(1).get(1)) * (query.get(0)-query.get(0))));
+		if ((t >= 0 && t <= 1) && (u >= 0 && u <= 1)) {
+			return true;
+		} //window's left line segment
+		
+		t = (((lineSegment.get(0).get(0)-query.get(1)) * (query.get(2)-query.get(3))) - ((lineSegment.get(0).get(1)-query.get(2)) * (query.get(1)-query.get(2)))) / 
+			(((lineSegment.get(0).get(0)-lineSegment.get(1).get(0)) * (query.get(2)-query.get(3))) - ((lineSegment.get(0).get(1)-lineSegment.get(1).get(1)) * (query.get(1)-query.get(2))));	
+		
+		u = (((lineSegment.get(0).get(0)-query.get(1)) * (lineSegment.get(0).get(1)-lineSegment.get(1).get(1))) - ((lineSegment.get(0).get(1)-query.get(2)) * (lineSegment.get(0).get(0)-lineSegment.get(1).get(0)))) / 
+			(((lineSegment.get(0).get(0)-lineSegment.get(1).get(0)) * (query.get(2)-query.get(3))) - ((lineSegment.get(0).get(1)-lineSegment.get(1).get(1)) * (query.get(1)-query.get(1))));
+		if ((t >= 0 && t <= 1) && (u >= 0 && u <= 1)) {
+			return true;
+		} //window's right line segment
+
+		return false;
+	}
+	
+	public static void main(String[] args) {
+		RefinementStep refinementQuery = new RefinementStep();
+		try {
+			refinementQuery.loadGrid();
+			refinementQuery.answerQueries();
+		} catch (IOException e) {}
 	}
 }

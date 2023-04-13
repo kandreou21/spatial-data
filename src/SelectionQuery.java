@@ -69,12 +69,12 @@ public class SelectionQuery {
 		for (int i = 0; i < queries.size(); i+=4) {
 			int numCells = 0;
 			List<Integer> ids = new ArrayList<Integer>();
-			List<Integer> refinementStepIds = new ArrayList<Integer>();
 			for (List<Integer> key : cellContents.keySet()) {	//for each key(where key is the cell's coordinates, ie (0,0))
 			    int x = key.get(0);
 			    int y = key.get(1);
-				if (cellContents.get(key).size() != 0) {	//an temnetai to cell(exei mapping se id)
-					if (grid[x][y].intersects(queries, i)) {
+				if (cellContents.get(key).size() != 0) {	//if cell has a mapping to at least one id
+					List<Double> query = List.of(queries.get(i), queries.get(i+1), queries.get(i+2), queries.get(i+3)); //xmin, xmax, ymin, ymax
+					if (grid[x][y].intersects(query)) {
 						numCells++;
 						for (Integer id : cellContents.get(key)) {	
 							double[][] mbr = records.get(id).getMbr();
@@ -82,8 +82,7 @@ public class SelectionQuery {
 								if (mbr[1][1] >= queries.get(i+2) && queries.get(i+3) >= mbr[0][1]) {		//an to yMax mbr >= yMin query kai yMin mbr <= yMax query
 									double[] referencePoint = {Math.max(mbr[0][0], queries.get(i)), Math.max(mbr[0][1], queries.get(i+2))};  
 									if (referencePoint[0] >= grid[x][y].getXMin() && referencePoint[0] <= grid[x][y].getXMax() && referencePoint[1] >= grid[x][y].getYMin() && referencePoint[1] <= grid[x][y].getYMax()) {
-										ids.add(id);	
-										
+										ids.add(id);		
 									}
 								}
 							}
@@ -97,5 +96,13 @@ public class SelectionQuery {
 			System.out.println("----------");
 			queryNum++;
 		}
+	}
+	
+	public static void main(String[] args) {
+		SelectionQuery query = new SelectionQuery();
+		try {
+			query.loadGrid();
+			query.answerQueries();
+		} catch (IOException e) {}
 	}
 }
