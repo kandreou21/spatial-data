@@ -13,48 +13,6 @@ public class GridCreator {
 	private double maxX = Double.NEGATIVE_INFINITY;
 	private double maxY = Double.NEGATIVE_INFINITY;
 	
-	public HashMap<List<Integer>, List<Integer>> findIntersections(HashMap<Integer, Record> records, Cell[][] grid) {
-		HashMap<List<Integer>, List<Integer>> cellContents = new HashMap<List<Integer>, List<Integer>>(); //key:cell(0,0), value:ids		
-
-		for (int j = 0; j < grid.length; j++) {			//for each row of grid
-			for (int k = 0; k < grid[j].length; k++) {	//for each cell in row
-				List<Integer> ids = new ArrayList<Integer>();	//list that contains the ids of mbr's that drop in a cell
-				Cell cell = grid[j][k];
-				for (int i = 1; i <= records.size(); i++) {		//for each record
-					double[][] mbr = records.get(i).getMbr();	//record's mbr [[MBRminX MBRminY],[MBRmaxX MBRmaxY]]
-					if (cell.intersects(mbr)) {
-						ids.add(records.get(i).getId());		
-						List<Integer> gridID = List.of(j, k);
-						cellContents.put(gridID, ids);		
-					}
-				}
-			}
-		}
-		/*
-		cellContents.entrySet().forEach(entry -> {
-		    System.out.println(entry.getKey() + " " + entry.getValue());
-		});
-		*/
-		//System.out.println(cellContents.size());
-		return cellContents;
-	}
-
-	public Cell[][] createGrid() {
-		HashMap<Integer, Record> records =  createRecords();
-		double xInterval = (maxX - minX) / 10;
-		double yInterval = (maxY - minY) / 10;
-		Cell[][] grid = new Cell[10][10];
-		for (int i = 0; i < grid.length; i++) {
-			for (int j = 0; j < grid[i].length; j++) {
-				double xLow = minX + i*xInterval;
-				double yLow = minY + j*yInterval;
-				Cell cell = new Cell(xLow, xLow+xInterval, yLow, yLow+yInterval);
-				grid[i][j] = cell;
-			}
-		}
-		return grid;
-	}
-
 	public HashMap<Integer, Record> createRecords() {
 		ArrayList<String> fileRows = readFile();
 		List<List<Double>> linestring;
@@ -118,6 +76,48 @@ public class GridCreator {
 		return lines;
 	}
 	
+	public Cell[][] createGrid() {
+		HashMap<Integer, Record> records =  createRecords();
+		double xInterval = (maxX - minX) / 10;
+		double yInterval = (maxY - minY) / 10;
+		Cell[][] grid = new Cell[10][10];
+		for (int i = 0; i < grid.length; i++) {
+			for (int j = 0; j < grid[i].length; j++) {
+				double xLow = minX + i*xInterval;
+				double yLow = minY + j*yInterval;
+				Cell cell = new Cell(xLow, xLow+xInterval, yLow, yLow+yInterval);
+				grid[i][j] = cell;
+			}
+		}
+		return grid;
+	}
+	
+	public HashMap<List<Integer>, List<Integer>> findIntersections(HashMap<Integer, Record> records, Cell[][] grid) {
+		HashMap<List<Integer>, List<Integer>> cellContents = new HashMap<List<Integer>, List<Integer>>(); //key:cell(0,0), value:ids that fall in cell		
+
+		for (int j = 0; j < grid.length; j++) {			//for each row of grid
+			for (int k = 0; k < grid[j].length; k++) {	//for each cell in row
+				List<Integer> ids = new ArrayList<Integer>();	//list that contains the ids of mbr's that drop in a cell
+				Cell cell = grid[j][k];
+				for (int i = 1; i <= records.size(); i++) {		//for each record
+					double[][] mbr = records.get(i).getMbr();	
+					if (cell.intersects(mbr)) {
+						ids.add(records.get(i).getId());		
+						List<Integer> gridID = List.of(j, k);
+						cellContents.put(gridID, ids);		
+					}
+				}
+			}
+		}
+		/*
+		cellContents.entrySet().forEach(entry -> {
+		    System.out.println(entry.getKey() + " " + entry.getValue());
+		});
+		*/
+		//System.out.println(cellContents.size());
+		return cellContents;
+	}
+	
 	public void printGrid(Cell[][] grid) {
 		for (int i = 0; i < grid.length; i++) {
 			for (int j = 0; j < grid[i].length; j++) {
@@ -137,7 +137,7 @@ public class GridCreator {
 					List<Integer> ids = cellContents.get(gridID);
 					for (int k = 0; k < ids.size(); k++) {
 						Record record = records.get(ids.get(k));
-						gridStream.println(record);		//(x,y) record(gia kathe record) 
+						gridStream.println(record);		
 					}
 				}
 			}
@@ -148,20 +148,17 @@ public class GridCreator {
 	public void writeGridDir(HashMap<List<Integer>, List<Integer>> cellContents) throws IOException {
 		PrintWriter gridStream = new PrintWriter(new java.io.FileWriter("grid.dir"));
 		gridStream.println(minX + " " + maxX + " " + minY + " " + maxY);	
-		int counter = 0;
 		for (int i = 0; i < 10; i++) {
 			for (int j = 0; j < 10; j++) {
 				List<Integer> gridID = List.of(i, j);
 				if (cellContents.containsKey(gridID) == false) {
 					gridStream.println(i + " " + j + " " + 0);
 				} else {
-					counter+=cellContents.get(gridID).size();
-					gridStream.println(i + " " + j + " " + cellContents.get(gridID).size());	//x y ids(pou peftoun sto cell)
+					gridStream.println(i + " " + j + " " + cellContents.get(gridID).size());	//x y ids(that fall in cell)
 				}
 			}
 		}
 		gridStream.close();
-		//System.out.println(counter); 37562,ara grid.dir athroisma ton ids = grid.grd lines 
 	}
 	
 	public static void main(String[] args) { //To create grid.dir and grid.grd files

@@ -14,17 +14,17 @@ public class Cell {
 	}
 	
 	public boolean intersects(double[][] mbr) {
-		if (xMax >= mbr[0][0] && mbr[1][0] >= xMin) { 		//an to xMax cell >= xMin tou mbr kai xMin cell <= xMax tou mbr
-			if (yMax >= mbr[0][1] &&  mbr[1][1] >= yMin) {	//an to yMax cell >= yMin tou mbr kai yMin cell <= yMax tou mbr
+		if (xMax >= mbr[0][0] && mbr[1][0] >= xMin) { 		//an to xMax >= xMin tou mbr kai xMin <= xMax tou mbr
+			if (yMax >= mbr[0][1] &&  mbr[1][1] >= yMin) {	//an to yMax >= yMin tou mbr kai yMin <= yMax tou mbr
 				return true;
 			}
 		}
 		return false;
 	}
 	
-	public boolean intersects(List<Double> query, int index) {	
-		if (xMax >= query.get(index) && query.get(index+1) >= xMin) { 		//an to xMax cell >= xMin query kai xMin cell <= xMax query
-			if (yMax >= query.get(index+2) && query.get(index+3) >= yMin) {	//an to yMax cell >= yMin query kai yMin cell <= yMax query
+	public boolean intersects(List<Double> query) {	
+		if (xMax >= query.get(0) && query.get(1) >= xMin) { 	//an to xMax >= xMin query kai xMin <= xMax query
+			if (yMax >= query.get(2) && query.get(3) >= yMin) {	//an to yMax >= yMin query kai yMin <= yMax query
 				return true;
 			}
 		}
