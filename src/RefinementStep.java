@@ -1,3 +1,4 @@
+//Konstantinos Andreou 4316
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,6 +8,7 @@ import java.util.Scanner;
 
 public class RefinementStep {
 	private GridCreator gridCreator;
+	private Cell[][] grid;
 	private HashMap<List<Integer>, List<Integer>> cellContents;
 	
 	public RefinementStep() {
@@ -18,7 +20,18 @@ public class RefinementStep {
 		Scanner dirScanner = new Scanner(new File("grid.dir"));
 		Scanner grdScanner = new Scanner(new File("grid.grd"));
 		
-		dirScanner.nextLine(); //skip first line
+		String[] firstLine = dirScanner.nextLine().split(" ");
+		double xInterval = (Double.parseDouble(firstLine[1]) - Double.parseDouble(firstLine[0])) / 10;
+		double yInterval = (Double.parseDouble(firstLine[3]) - Double.parseDouble(firstLine[2])) / 10;
+		grid = new Cell[10][10];
+		for (int i = 0; i < grid.length; i++) {
+			for (int j = 0; j < grid[i].length; j++) {
+				double xLow = Double.parseDouble(firstLine[0]) + i*xInterval;
+				double yLow = Double.parseDouble(firstLine[2]) + j*yInterval;
+				Cell cell = new Cell(xLow, xLow+xInterval, yLow, yLow+yInterval);
+				grid[i][j] = cell;
+			}
+		}
 		while (dirScanner.hasNextLine()) { 
 			String[] dirLineFields = dirScanner.nextLine().split(" ");
 			int x = Integer.parseInt(dirLineFields[0]);
@@ -63,7 +76,6 @@ public class RefinementStep {
 		} catch (IOException e) {System.out.println("Unable to read queries.txt");}
 		
 		System.out.println("Meros 3\n");
-		Cell[][] grid = gridCreator.createGrid();
 		HashMap<Integer, Record> records = gridCreator.createRecords();
 		int queryNum = 1;
 		for (int i = 0; i < queries.size(); i+=4) {

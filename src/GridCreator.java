@@ -1,3 +1,4 @@
+//Konstantinos Andreou 4316
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -8,10 +9,10 @@ import java.util.List;
 
 public class GridCreator {
 	private static final String csvFile = "tiger_roads.csv";
-	private double minX = Double.POSITIVE_INFINITY;
-	private double minY = Double.POSITIVE_INFINITY;
-	private double maxX = Double.NEGATIVE_INFINITY;
-	private double maxY = Double.NEGATIVE_INFINITY;
+	double minX = Double.POSITIVE_INFINITY;
+	double minY = Double.POSITIVE_INFINITY;
+	double maxX = Double.NEGATIVE_INFINITY;
+	double maxY = Double.NEGATIVE_INFINITY;
 	
 	public HashMap<Integer, Record> createRecords() {
 		ArrayList<String> fileRows = readFile();

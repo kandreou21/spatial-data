@@ -1,3 +1,4 @@
+//Konstantinos Andreou 4316
 import java.util.List;
 
 public class Cell {
@@ -15,7 +16,7 @@ public class Cell {
 	
 	public boolean intersects(double[][] mbr) {
 		if (xMax >= mbr[0][0] && mbr[1][0] >= xMin) { 		//an to xMax >= xMin tou mbr kai xMin <= xMax tou mbr
-			if (yMax >= mbr[0][1] &&  mbr[1][1] >= yMin) {	//an to yMax >= yMin tou mbr kai yMin <= yMax tou mbr
+			if (yMax >= mbr[0][1] && mbr[1][1] >= yMin) {	//an to yMax >= yMin tou mbr kai yMin <= yMax tou mbr
 				return true;
 			}
 		}
