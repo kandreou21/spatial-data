@@ -1,2 +1,2 @@
 # Spatial-data
-Spatial Data managing
+Spatial Data indexing using Grid and query answering using refinement step.
